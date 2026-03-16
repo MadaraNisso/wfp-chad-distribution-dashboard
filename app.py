@@ -11,22 +11,22 @@ import dash
 from dash import dcc, html, Input, Output, State, ctx, no_update
 import dash_bootstrap_components as dbc
 
-# ── BRAND — WFP Official Colors (extracted from logo) ────────────────────────
-T_NAVY    = "#004F87"   # WFP dark navy blue
-T_BLUE    = "#0069B5"   # WFP primary blue (exact from logo)
-T_BLUE2   = "#0079C7"   # WFP medium blue
-T_LIGHT   = "#DBEBF5"   # WFP light blue (exact from logo)
-T_TEAL    = "#0095A8"   # UN teal accent
-T_GREEN   = "#1A7A4A"   # Success green
-T_GREEN_L = "#D4EDE1"   # Green light
-T_ORANGE  = "#E07B2A"   # Warning orange
-T_ORANGE_L= "#FDF0E0"   # Orange light
-T_RED     = "#C0392B"   # Alert red
-WHITE     = "#FFFFFF"
-GRAY_BG   = "#F2F6FA"   # Page background
-GRAY_LINE = "#D5E3EF"   # Borders
-GRAY_TEXT = "#4A6080"   # Secondary text
-FONT      = "'Open Sans','Source Sans Pro','Segoe UI',Arial,sans-serif"
+# ── BRAND — 5 couleurs image (navy · blue · orange · green · white) ───────────
+T_NAVY    = "#17375E"   # ① Navy foncé  — headers tableau, accents forts
+T_BLUE    = "#0B72C0"   # ② WFP Blue    — labels, highlights, primaire
+T_BLUE2   = "#1A85D6"   # variation blue
+T_LIGHT   = "#EBF4FC"   # tint (dérivé)
+T_TEAL    = "#0B72C0"
+T_GREEN   = "#22A060"   # ③ Vert        — projection, objectif, succès
+T_GREEN_L = "#E8F7EF"   # tint vert
+T_ORANGE  = "#E07020"   # ④ Orange      — restant, tendance, alerte
+T_ORANGE_L= "#FEF0E4"   # tint orange
+T_RED     = "#E07020"
+WHITE     = "#FFFFFF"   # ⑤ Blanc       — cartes, fonds
+GRAY_BG   = "#F0F4F8"   # fond page (dérivé)
+GRAY_LINE = "#D8E4EF"   # bordures
+GRAY_TEXT = "#4A6070"   # texte secondaire
+FONT      = "'Inter','system-ui',sans-serif"
 
 # ── CIBLES ───────────────────────────────────────────────────────────────────
 TARGET_V = 16_940
@@ -157,7 +157,7 @@ def build_chart(entries):
     )
 
     fig.update_layout(
-        font_family=FONT, font_size=13,
+        font_family=FONT, font_size=14,
         plot_bgcolor="#FAFCFE", paper_bgcolor=WHITE,
         margin=dict(l=0, r=0, t=14, b=0),
         barmode="group", bargap=0.22, bargroupgap=0.05,
@@ -168,16 +168,16 @@ def build_chart(entries):
             bgcolor="rgba(0,0,0,0)",
         ),
         hovermode="x unified",
-        hoverlabel=dict(bgcolor=T_NAVY, font_size=13, font_family=FONT, font_color=WHITE, bordercolor=T_BLUE2),
-        xaxis=dict(showgrid=False, tickfont=dict(size=12, color=GRAY_TEXT), linecolor=GRAY_LINE, tickangle=-30),
+        hoverlabel=dict(bgcolor=T_NAVY, font_size=14, font_family=FONT, font_color=WHITE, bordercolor=T_BLUE2),
+        xaxis=dict(showgrid=False, tickfont=dict(size=13, color=GRAY_TEXT), linecolor=GRAY_LINE, tickangle=-30),
         yaxis=dict(
-            title=dict(text="Bénéficiaires / Ménages · Jour", font=dict(color=GRAY_TEXT, size=12)),
+            title=dict(text="Bénéficiaires / Ménages · Jour", font=dict(color=GRAY_TEXT, size=13)),
             showgrid=True, gridcolor="#E8EFF5", gridwidth=1,
-            tickfont=dict(size=12, color=GRAY_TEXT), zeroline=False,
+            tickfont=dict(size=13, color=GRAY_TEXT), zeroline=False,
         ),
         yaxis2=dict(
-            title=dict(text="Cumul Ménages", font=dict(color=T_NAVY, size=12)),
-            tickfont=dict(size=12, color=T_NAVY),
+            title=dict(text="Cumul Ménages", font=dict(color=T_NAVY, size=13)),
+            tickfont=dict(size=13, color=T_NAVY),
             range=[0, TARGET_V * 1.08], showgrid=False, zeroline=False,
         ),
     )
@@ -250,67 +250,87 @@ def build_pie_chart(t):
 
 # ── COMPOSANTS ───────────────────────────────────────────────────────────────
 def stat_block(label, value, sub="", color=T_NAVY):
+    is_highlight = (color == T_BLUE)
     return html.Div([
-        html.Div(label,  className="stat-lbl"),
-        html.Div(value,  className="stat-val", style={"color": color}),
-        html.Div(sub,    className="stat-sub") if sub else None,
-    ], className="stat-block")
+        html.Div(label,
+                 className="text-[11px] font-semibold uppercase tracking-[1.2px] mb-2",
+                 style={"color": GRAY_TEXT}),
+        html.Div([
+            html.Div(value,
+                     className="text-[1.9rem] font-extrabold leading-none tracking-tight",
+                     style={"color": color}),
+            html.Div(className="h-[3px] mt-2 rounded-full",
+                     style={"background": color, "width": "32px"}) if is_highlight else None,
+        ]),
+        html.Div(sub,
+                 className="text-[12px] font-medium mt-2",
+                 style={"color": GRAY_TEXT}) if sub else None,
+    ], className="flex-1 min-w-0")
 
 def make_trend_card(tr, t):
     if tr["days_remaining"] is None:
         return html.Div([
-            html.Div("📊", style={"fontSize":"2rem","marginBottom":"8px"}),
+            html.Div("📊", className="text-4xl mb-2"),
             html.Div("Ajoutez des saisies pour calculer la projection.",
-                     style={"fontSize":".82rem","color":GRAY_TEXT,"textAlign":"center"}),
-        ], className="trend-empty")
+                     className="text-xs text-[#3A5070] text-center"),
+        ], className="flex flex-col items-center justify-center p-6")
 
     color = T_GREEN if tr["days_remaining"] <= 14 else (T_BLUE if tr["days_remaining"] <= 30 else T_ORANGE)
     bg    = T_GREEN_L if tr["days_remaining"] <= 14 else (T_LIGHT if tr["days_remaining"] <= 30 else T_ORANGE_L)
 
     return html.Div([
-
-        # Ligne 1 — 2 mini stats
+        # Mini stats
         html.Div([
             html.Div([
-                html.Div("Rythme moyen", className="tc-lbl"),
+                html.Div("RYTHME MOYEN",
+                         className="text-[10px] font-semibold uppercase tracking-[1.2px] mb-1.5",
+                         style={"color": GRAY_TEXT}),
                 html.Div([
-                    html.Span(fmt(tr["avg_daily"]), className="tc-val",
+                    html.Span(fmt(tr["avg_daily"]),
+                              className="text-[1.9rem] font-extrabold leading-none tracking-tight",
                               style={"color": T_BLUE}),
-                    html.Span(" / jour", className="tc-unit"),
+                    html.Span(" / jour",
+                              className="text-[13px] font-medium ml-1.5",
+                              style={"color": GRAY_TEXT}),
                 ]),
-            ], className="tc-stat"),
-            html.Div(className="tc-sep"),
+            ], className="flex-1"),
+            html.Div(className="w-px mx-4 self-stretch", style={"background": GRAY_LINE}),
             html.Div([
-                html.Div("Restant", className="tc-lbl"),
+                html.Div("RESTANT",
+                         className="text-[10px] font-semibold uppercase tracking-[1.2px] mb-1.5",
+                         style={"color": GRAY_TEXT}),
                 html.Div([
-                    html.Span(fmt(t["rst_v"]), className="tc-val",
+                    html.Span(fmt(t["rst_v"]),
+                              className="text-[1.9rem] font-extrabold leading-none tracking-tight",
                               style={"color": T_ORANGE}),
-                    html.Span(" ménages", className="tc-unit"),
+                    html.Span(" ménages",
+                              className="text-[13px] font-medium ml-1.5",
+                              style={"color": GRAY_TEXT}),
                 ]),
-            ], className="tc-stat"),
-        ], className="tc-row"),
-
-        # Ligne 2 — résultat principal
+            ], className="flex-1"),
+        ], className="flex items-center rounded-lg px-5 py-4",
+           style={"background": "#F7FAFD", "border": f"1px solid {GRAY_LINE}"}),
+        # Main result
         html.Div([
             html.Div([
-                html.Div(str(tr["days_remaining"]), className="tc-days",
-                         style={"color": color}),
-                html.Div(f"jour{'s' if tr['days_remaining']>1 else ''}",
-                         className="tc-days-lbl", style={"color": color}),
-            ], className="tc-days-block",
-               style={"background": bg, "borderColor": color}),
+                html.Div(str(tr["days_remaining"]),
+                         className="text-[3.2rem] font-extrabold leading-none tracking-tighter",
+                         style={"color": T_GREEN}),
+                html.Div(f"JOUR{'S' if tr['days_remaining']>1 else ''}",
+                         className="text-[9px] font-bold uppercase tracking-[2px] mt-1",
+                         style={"color": T_GREEN}),
+            ], className="flex flex-col items-center justify-center min-w-[90px] h-[90px] rounded-xl flex-shrink-0",
+               style={"border": f"2px solid {T_GREEN}", "background": T_GREEN_L}),
             html.Div([
-                html.Div("Objectif estimé atteint dans",
-                         style={"fontSize":".72rem","color":GRAY_TEXT,
-                                "fontWeight":"600","textTransform":"uppercase",
-                                "letterSpacing":".5px","marginBottom":"4px"}),
+                html.Div("OBJECTIF ESTIMÉ ATTEINT DANS",
+                         className="text-[10px] font-semibold uppercase tracking-[1px] mb-2",
+                         style={"color": GRAY_TEXT}),
                 html.Div(tr["est_date"].strftime("%d %b %Y").upper(),
-                         style={"fontSize":"1rem","fontWeight":"800",
-                                "color": color}),
-            ]),
-        ], className="tc-result"),
-
-    ], className="tc-card")
+                         className="text-[1.4rem] font-extrabold tracking-wide",
+                         style={"color": T_GREEN}),
+            ], className="ml-5"),
+        ], className="flex items-center"),
+    ], className="flex flex-col gap-4 p-5")
 
 # ── APP ──────────────────────────────────────────────────────────────────────
 app = dash.Dash(
@@ -325,191 +345,209 @@ app = dash.Dash(
 app.layout = lambda: html.Div([
     dcc.Store(id="store", data=load(), storage_type="local"),
     dcc.Store(id="del-id"),
-    dcc.ConfirmDialog(id="confirm-del",
-                      message="Confirmer la suppression de cette entrée ?"),
+    dcc.ConfirmDialog(id="confirm-del", message="Confirmer la suppression de cette entrée ?"),
 
     # ── HEADER ──────────────────────────────────────────────────────────────
     html.Header([
         html.Div([
             LOGO_IMG,
-            html.Div(className="hdr-divider"),
+            html.Div(className="w-px h-11 bg-[#D5E3EF] mx-6 flex-shrink-0"),
             html.Div([
-                html.Div("UN WFP CHAD", className="hdr-org"),
+                html.Div("UN WFP CHAD",
+                         className="text-[#0069B5] font-extrabold text-[19px] uppercase tracking-[2px] leading-none mb-1.5"),
                 html.Div("TABLEAU DE BORD — DISTRIBUTION ENCOURS",
-                         className="hdr-title"),
+                         className="text-[#004F87] font-bold text-[13px] uppercase tracking-[0.8px]"),
                 html.Div("Suivi opérationnel · Ménages · Bénéficiaires · Montants XAF",
-                         className="hdr-sub"),
+                         className="text-[#3A5070] text-[12px] mt-1"),
             ]),
             html.Div([
                 html.Div([
-                    html.Div("Rapport du",       className="meta-lbl"),
+                    html.Div("Rapport du",
+                             className="text-[10px] font-bold uppercase tracking-[1.2px] text-[#3A5070] mb-1"),
                     html.Div(datetime.today().strftime("%d %b %Y").upper(),
-                             className="meta-val"),
-                ], className="meta-block"),
-                html.Div(className="meta-sep"),
+                             className="text-[15px] font-bold text-[#004F87]"),
+                ], className="px-6 py-4 border-l border-[#D5E3EF] text-center"),
                 html.Div([
-                    html.Div("Taux de réalisation", className="meta-lbl"),
-                    html.Div(id="hdr-taux",          className="meta-val accent"),
-                ], className="meta-block"),
-                html.Div(className="meta-sep"),
+                    html.Div("Taux de réalisation",
+                             className="text-[10px] font-bold uppercase tracking-[1.2px] text-[#3A5070] mb-1"),
+                    html.Div(id="hdr-taux",
+                             className="text-[22px] font-extrabold text-[#0069B5]"),
+                ], className="px-6 py-4 border-l border-[#D5E3EF] text-center"),
                 html.Div([
-                    html.Div("Dernière saisie", className="meta-lbl"),
-                    html.Div(id="hdr-last",     className="meta-val"),
-                ], className="meta-block"),
-            ], className="hdr-meta"),
-        ], className="hdr-body"),
-    ]),
+                    html.Div("Dernière saisie",
+                             className="text-[10px] font-bold uppercase tracking-[1.2px] text-[#3A5070] mb-1"),
+                    html.Div(id="hdr-last",
+                             className="text-[15px] font-bold text-[#004F87]"),
+                ], className="px-6 py-4 border-l border-r border-[#D5E3EF] text-center"),
+            ], className="ml-auto flex items-stretch"),
+        ], className="flex items-center px-10 max-w-[1440px] mx-auto min-h-[72px]"),
+    ], className="bg-white border-b-[3px] border-[#0069B5] sticky top-0 z-50",
+       style={"boxShadow": "0 2px 12px rgba(0,105,181,0.12)"}),
 
     # ── PAGE ────────────────────────────────────────────────────────────────
     html.Div([
 
-        # ── KPI GRID ────────────────────────────────────────────────────────
+        # KPI Grid
         html.Div([
-
-            # Bénéficiaires
             html.Div([
                 html.Div([
-                    html.Span("👥", style={"fontSize":"28px"}),
-                    html.Span("BÉNÉFICIAIRES SERVIS", className="mc-lbl"),
-                ], className="mc-head"),
-                html.Div(id="kpi-benef", className="mc-big"),
-                html.Div("Total cumulé depuis le début", className="mc-note"),
-            ], className="mc mc-blue-light"),
+                    html.Span("👥", className="text-3xl"),
+                    html.Span("BÉNÉFICIAIRES SERVIS",
+                              className="text-[12px] font-bold tracking-[1.5px] uppercase ml-3",
+                              style={"color":"rgba(219,235,245,0.85)"}),
+                ], className="flex items-center mb-4"),
+                html.Div(id="kpi-benef",
+                         className="text-[4.2rem] font-extrabold text-white leading-none tracking-[-3px]"),
+                html.Div(className="h-[3px] w-14 rounded-full bg-white opacity-40 my-3"),
+                html.Div("Total cumulé depuis le début",
+                         className="text-[12.5px]",
+                         style={"color":"rgba(255,255,255,0.65)"}),
+            ], className="rounded-xl p-5 border-l-4 border-[rgba(255,255,255,0.25)]",
+               style={"background": f"linear-gradient(145deg, {T_BLUE} 0%, {T_NAVY} 100%)",
+                      "boxShadow": "0 4px 16px rgba(0,105,181,0.25)"}),
 
-            # Ménages
             html.Div([
                 html.Div([
-                    html.Span("🏠", style={"fontSize":"28px"}),
-                    html.Span("MÉNAGES — VOUCHERS", className="mc-lbl"),
-                ], className="mc-head"),
+                    html.Span("🏠", className="text-3xl"),
+                    html.Span("MÉNAGES — VOUCHERS",
+                              className="text-[12px] font-bold tracking-[1.5px] uppercase text-[#3A5070] ml-3"),
+                ], className="flex items-center mb-4"),
                 html.Div(id="kpi-v"),
-            ], className="mc mc-white"),
+            ], className="bg-white rounded-xl p-5 border-t-[3px] border-[#0069B5]",
+               style={"boxShadow": "0 2px 12px rgba(0,105,181,0.10)"}),
 
-            # Montant
             html.Div([
                 html.Div([
-                    html.Span("💰", style={"fontSize":"28px"}),
-                    html.Span("MONTANT XAF", className="mc-lbl"),
-                ], className="mc-head"),
+                    html.Span("💰", className="text-3xl"),
+                    html.Span("MONTANT XAF",
+                              className="text-[12px] font-bold tracking-[1.5px] uppercase text-[#3A5070] ml-3"),
+                ], className="flex items-center mb-4"),
                 html.Div(id="kpi-m"),
-            ], className="mc mc-white"),
+            ], className="bg-white rounded-xl p-5 border-t-[3px] border-[#0095A8]",
+               style={"boxShadow": "0 2px 12px rgba(0,105,181,0.10)"}),
 
-        ], className="kpi-grid"),
+        ], className="grid gap-4 mb-5",
+           style={"gridTemplateColumns": "1fr 2.2fr 2.2fr"}),
 
-        # ── GRAPHIQUE ───────────────────────────────────────────────────────
+        # Graphique
         html.Div([
             html.Div([
                 html.Div([
                     html.Div("ÉVOLUTION JOURNALIÈRE & TENDANCE VERS L'OBJECTIF",
-                             className="section-lbl"),
+                             className="text-[13px] font-bold uppercase tracking-[1.3px] text-[#0069B5]"),
                     html.Div("Bénéficiaires · Ménages · Cumul · Projection",
-                             className="card-sub"),
+                             className="text-[13px] text-[#3A5070] mt-0.5"),
                 ]),
-                html.Div(id="chart-badge", className="badge"),
-            ], className="chart-hdr"),
+                html.Div(id="chart-badge",
+                         className="text-[12px] font-bold text-[#0069B5] bg-[#E8F2FB] border border-[#C0D8EE] px-3.5 py-1 rounded-full whitespace-nowrap"),
+            ], className="flex items-center justify-between px-5 py-3.5 border-b border-[#D5E3EF]"),
             dcc.Graph(
-                id="main-chart",
-                figure=EMPTY_FIG,
-                config={
-                    "displayModeBar": True,
-                    "modeBarButtonsToRemove": ["select2d","lasso2d"],
-                    "displaylogo": False,
-                    "toImageButtonOptions": {
-                        "format":"png","filename":"wfp_distribution",
-                        "width":1400,"height":520,"scale":2,
-                    },
-                },
+                id="main-chart", figure=EMPTY_FIG,
+                config={"displayModeBar": True,
+                        "modeBarButtonsToRemove": ["select2d","lasso2d"],
+                        "displaylogo": False,
+                        "toImageButtonOptions": {"format":"png","filename":"wfp_distribution","width":1400,"height":520,"scale":2}},
                 style={"height":"400px"},
             ),
-        ], className="chart-card"),
+        ], className="bg-white rounded-xl mb-5 overflow-hidden",
+           style={"boxShadow": "0 2px 12px rgba(0,105,181,0.10)"}),
 
-        # ── PIE + PROJECTION ─────────────────────────────────────────────────
+        # Pie + Projection
         dbc.Row([
             dbc.Col([
                 html.Div([
                     html.Div([
-                        html.Div("TAUX DE RÉALISATION", className="section-lbl"),
-                        html.Div("Ménages & Montant XAF", className="card-sub"),
-                    ], className="chart-hdr"),
-                    dcc.Graph(
-                        id="pie-chart",
-                        config={"displayModeBar": False},
-                        style={"height": "240px"},
-                    ),
-                ], className="chart-card h-100"),
+                        html.Div("TAUX DE RÉALISATION",
+                                 className="text-[13px] font-bold uppercase tracking-[1.3px] text-[#0069B5]"),
+                        html.Div("Ménages & Montant XAF",
+                                 className="text-[13px] text-[#3A5070] mt-0.5"),
+                    ], className="px-5 py-3.5 border-b border-[#D5E3EF]"),
+                    dcc.Graph(id="pie-chart", config={"displayModeBar": False},
+                              style={"height":"240px"}),
+                ], className="bg-white rounded-xl overflow-hidden h-full",
+                   style={"boxShadow": "0 2px 12px rgba(0,105,181,0.10)"}),
             ], md=7),
             dbc.Col([
                 html.Div([
                     html.Div([
-                        html.Div("PROJECTION OBJECTIF", className="section-lbl"),
-                    ], className="chart-hdr"),
+                        html.Div("PROJECTION OBJECTIF",
+                                 className="text-[13px] font-bold uppercase tracking-[1.3px] text-[#0069B5]"),
+                    ], className="px-5 py-3.5 border-b border-[#D5E3EF]"),
                     html.Div(id="trend-body"),
-                ], className="chart-card h-100"),
+                ], className="bg-white rounded-xl overflow-hidden h-full",
+                   style={"boxShadow": "0 2px 12px rgba(0,105,181,0.10)"}),
             ], md=5),
-        ], className="g-3 mb-3"),
+        ], className="g-3 mb-5"),
 
-        # ── TABLEAU ──────────────────────────────────────────────────────────
+        # Tableau
         html.Div([
             html.Div([
                 html.Div([
-                    html.Div("DONNÉES JOURNALIÈRES", className="section-lbl"),
-                    html.Span(id="row-count", className="badge"),
-                ], style={"display":"flex","alignItems":"center","gap":"14px"}),
-            ], className="table-hdr"),
-            html.Div(id="table-area", style={"overflowX": "auto"}),
-        ], className="table-card"),
+                    html.Div("DONNÉES JOURNALIÈRES",
+                             className="text-[13px] font-bold uppercase tracking-[1.3px] text-[#0069B5]"),
+                    html.Span(id="row-count",
+                              className="text-[12px] font-bold text-[#0069B5] bg-[#E8F2FB] border border-[#C0D8EE] px-3.5 py-1 rounded-full ml-3"),
+                ], className="flex items-center"),
+            ], className="px-5 py-3.5 border-b border-[#D5E3EF]"),
+            html.Div(id="table-area", className="overflow-x-auto"),
+        ], className="bg-white rounded-xl mb-5 overflow-hidden",
+           style={"boxShadow": "0 2px 12px rgba(0,105,181,0.10)"}),
 
-        # ── FORMULAIRE ──────────────────────────────────────────────────────
+        # Formulaire
         html.Div([
             html.Div([
-                html.Div("SAISIE JOURNALIÈRE", className="section-lbl"),
-                html.Div("Renseignez les données de distribution du jour", className="card-sub"),
-            ], className="form-hdr"),
+                html.Div("SAISIE JOURNALIÈRE",
+                         className="text-[13px] font-bold uppercase tracking-[1.3px] text-[#0069B5]"),
+                html.Div("Renseignez les données de distribution du jour",
+                         className="text-[13px] text-[#3A5070] mt-0.5"),
+            ], className="px-5 py-3.5 border-b border-[#D5E3EF]"),
             html.Div([
                 html.Div([
-                    html.Label("Date", className="field-lbl"),
-                    dcc.DatePickerSingle(
-                        id="f-date", date=date.today().isoformat(),
-                        display_format="DD/MM/YYYY",
-                        style={"width": "100%"},
-                    ),
-                ], className="fg"),
+                    html.Label("Date",
+                               className="block text-[11px] font-bold uppercase tracking-[0.7px] text-[#3A5070] mb-2"),
+                    dcc.DatePickerSingle(id="f-date", date=date.today().isoformat(),
+                                        display_format="DD/MM/YYYY", style={"width":"100%"}),
+                ], className="flex flex-col"),
                 html.Div([
-                    html.Label("Bénéficiaires servis", className="field-lbl"),
+                    html.Label("Bénéficiaires servis",
+                               className="block text-[11px] font-bold uppercase tracking-[0.7px] text-[#3A5070] mb-2"),
                     dcc.Input(id="f-ben", type="number", min=0,
                               placeholder="ex : 4 250", className="finput"),
-                ], className="fg"),
+                ], className="flex flex-col"),
                 html.Div([
-                    html.Label("Ménages (Vouchers)", className="field-lbl"),
+                    html.Label("Ménages (Vouchers)",
+                               className="block text-[11px] font-bold uppercase tracking-[0.7px] text-[#3A5070] mb-2"),
                     dcc.Input(id="f-vch", type="number", min=0,
                               placeholder="ex : 850", className="finput"),
-                ], className="fg"),
+                ], className="flex flex-col"),
                 html.Div([
-                    html.Label("Montant XAF", className="field-lbl"),
+                    html.Label("Montant XAF",
+                               className="block text-[11px] font-bold uppercase tracking-[0.7px] text-[#3A5070] mb-2"),
                     dcc.Input(id="f-amt", type="number", min=0,
                               placeholder="ex : 20 450 000", className="finput"),
-                ], className="fg"),
+                ], className="flex flex-col"),
                 html.Div([
                     html.Button("＋ Ajouter", id="btn-add", className="btn-primary"),
                     html.Button("⬇ CSV",     id="btn-csv", className="btn-sec"),
                     dcc.Download(id="download"),
-                ], className="fg fg-btns"),
-            ], className="form-grid"),
-            html.Div(id="form-msg"),
-        ], className="form-card"),
+                ], className="flex gap-2 items-end"),
+            ], className="grid gap-4 p-5 items-end",
+               style={"gridTemplateColumns": "155px 1fr 1fr 1fr auto"}),
+            html.Div(id="form-msg", className="px-5 pb-3"),
+        ], className="bg-white rounded-xl mb-5 overflow-hidden",
+           style={"boxShadow": "0 2px 12px rgba(0,105,181,0.10)"}),
 
-        # FOOTER
+        # Footer
         html.Footer([
             html.Div([
-                html.Strong("UN WFP CHAD",
-                            style={"color": T_BLUE}),
+                html.Strong("UN WFP CHAD", style={"color": T_BLUE}),
                 html.Span(" — Tableau de bord distribution encours",
-                          style={"color": GRAY_TEXT}),
+                          className="text-[#3A5070]"),
             ]),
-            html.Div(id="footer-ts"),
-        ], className="page-footer"),
+            html.Div(id="footer-ts", className="text-[#3A5070]"),
+        ], className="border-t-2 border-[#0069B5] pt-4 pb-7 flex items-center justify-between text-[12px]"),
 
-    ], className="page"),
+    ], className="max-w-[1360px] mx-auto px-7 pt-7"),
 ])
 
 # ── CALLBACKS ────────────────────────────────────────────────────────────────
@@ -618,25 +656,27 @@ def update(data):
     # Bénéficiaires
     kpi_b = html.Span(fmt(t["tot_b"]))
 
+    SEP = html.Div(className="w-px bg-[#D5E3EF] mx-4 self-stretch flex-shrink-0")
+
     # Ménages tri-stat
     kpi_v = html.Div([
         stat_block("Planifié",  fmt(TARGET_V),   color=GRAY_TEXT),
-        html.Div(className="stat-sep"),
+        SEP,
         stat_block("Servis",    fmt(t["tot_v"]),
                    f"{t['pct_v']:.1f}% du planifié", color=T_BLUE),
-        html.Div(className="stat-sep"),
-        stat_block("Restant",   fmt(t["rst_v"]), color=T_ORANGE),
-    ], className="stat-row")
+        SEP,
+        stat_block("Restant",   fmt(t["rst_v"]), color="#E07020"),
+    ], className="flex items-stretch py-1")
 
     # Montant tri-stat
     kpi_m = html.Div([
         stat_block("Planifié",  fmt(TARGET_M)+" XAF", color=GRAY_TEXT),
-        html.Div(className="stat-sep"),
+        SEP,
         stat_block("Servi",     fmt(t["tot_m"])+" XAF",
                    f"{t['pct_m']:.1f}% du planifié", color=T_BLUE),
-        html.Div(className="stat-sep"),
-        stat_block("Restant",   fmt(t["rst_m"])+" XAF", color=T_ORANGE),
-    ], className="stat-row")
+        SEP,
+        stat_block("Restant",   fmt(t["rst_m"])+" XAF", color="#E07020"),
+    ], className="flex items-stretch py-1")
 
     # Pie chart
     pie_fig   = build_pie_chart(t)
@@ -647,8 +687,8 @@ def update(data):
 
     # Table
     if not entries:
-        table = html.Div("Aucune saisie — utilisez le formulaire ci-dessus.",
-                         className="empty-table")
+        table = html.Div("Aucune saisie — utilisez le formulaire ci-dessous.",
+                         className="text-center text-[#3A5070] py-11 text-[.9rem]")
     else:
         se = sorted(entries, key=lambda e: e["date"], reverse=True)
         cm: dict = {}; c = BASE_V
@@ -661,30 +701,35 @@ def update(data):
             pv = e["v"]/TARGET_V*100
             pm = e["m"]/TARGET_M*100
             rows.append(html.Tr([
-                html.Td(f"{d[8:]}/{d[5:7]}/{d[:4]}", className="td-date"),
-                html.Td(fmt(e.get("b",0)),            className="td-b"),
-                html.Td(html.Strong(fmt(e["v"]))),
-                html.Td(html.Span(f"{pv:.2f}%",       className="pill pill-blue")),
-                html.Td(fmt(e["m"])+" XAF"),
-                html.Td(html.Span(f"{pm:.2f}%",       className="pill pill-green")),
-                html.Td(html.Strong(fmt(cm[e["id"]]), style={"color":T_NAVY})),
+                html.Td(f"{d[8:]}/{d[5:7]}/{d[:4]}",
+                        className="px-4 py-3.5 text-[#3A5070] text-[13px] whitespace-nowrap font-semibold"),
+                html.Td(fmt(e.get("b",0)),
+                        className="px-4 py-3.5 font-extrabold text-[15px]",
+                        style={"color": T_BLUE}),
+                html.Td(html.Strong(fmt(e["v"]), style={"fontSize":"15px","color":T_NAVY}),
+                        className="px-4 py-3.5"),
+                html.Td(html.Span(f"{pv:.2f}%",
+                        className="inline-block px-3 py-1 rounded-full text-[12px] font-semibold bg-[#EBF4FC] text-[#0B72C0]"),
+                        className="px-4 py-3.5"),
+                html.Td(fmt(e["m"])+" XAF",
+                        className="px-4 py-3.5 whitespace-nowrap text-[13px] font-semibold"),
+                html.Td(html.Span(f"{pm:.2f}%",
+                        className="inline-block px-3 py-1 rounded-full text-[12px] font-semibold bg-[#E8F7EF] text-[#22A060]"),
+                        className="px-4 py-3.5"),
+                html.Td(html.Strong(fmt(cm[e["id"]]), style={"color":"#17375E","fontSize":"15px"}),
+                        className="px-4 py-3.5"),
                 html.Td(html.Button("✕",
                         id={"type":"btn-del","index":e["id"]},
-                        className="btn-del")),
-            ], className="tr-alt" if i%2 else ""))
+                        className="text-[#B0BFCE] hover:text-[#E07B2A] bg-transparent border-none cursor-pointer px-2 py-1 rounded text-[15px] transition-colors"),
+                        className="px-2 py-3.5"),
+            ], className=f"border-b border-[#D5E3EF] transition-colors {'bg-[#F7FAFE]' if i%2 else 'bg-white'}"))
         table = html.Table([
             html.Thead(html.Tr([
-                html.Th("Date"),
-                html.Th("Bénéficiaires"),
-                html.Th("Ménages / Jour"),
-                html.Th("% Cible Ménages"),
-                html.Th("Montant / Jour"),
-                html.Th("% Cible Montant"),
-                html.Th("Cumul Ménages"),
-                html.Th(""),
-            ])),
+                html.Th(col, className="px-4 py-4 text-left text-[12px] font-bold uppercase tracking-[1px] text-white whitespace-nowrap")
+                for col in ["Date","Bénéficiaires","Ménages / Jour","% Cible Ménages","Montant / Jour","% Cible Montant","Cumul Ménages",""]
+            ]), style={"background": f"linear-gradient(90deg, {T_BLUE} 0%, {T_NAVY} 100%)"}),
             html.Tbody(rows),
-        ], className="dist-table")
+        ], className="w-full border-collapse text-sm")
 
     ld        = sorted(entries,key=lambda e:e["date"])[-1]["date"] if entries else None
     hdr_last  = f"{ld[8:]}/{ld[5:7]}/{ld[:4]}" if ld else "—"
@@ -702,362 +747,36 @@ app.index_string = f"""<!DOCTYPE html>
 <head>
   {{%metas%}}<title>{{%title%}}</title>{{%favicon%}}{{%css%}}
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {{
+      theme: {{
+        extend: {{
+          fontFamily: {{ sans: ['"Inter"','"system-ui"','sans-serif'] }}
+        }}
+      }}
+    }}
+  </script>
   <style>
-  :root {{
-    --navy:    {T_NAVY};
-    --blue:    {T_BLUE};
-    --blue2:   {T_BLUE2};
-    --teal:    {T_TEAL};
-    --light:   {T_LIGHT};
-    --green:   {T_GREEN};
-    --orange:  {T_ORANGE};
-    --gray-bg: {GRAY_BG};
-    --gray-ln: {GRAY_LINE};
-    --gray-txt:{GRAY_TEXT};
-    --white:   {WHITE};
-    --shadow-sm: 0 1px 4px rgba(0,73,153,.08), 0 1px 2px rgba(0,73,153,.04);
-    --shadow:    0 2px 12px rgba(0,73,153,.10), 0 1px 4px rgba(0,73,153,.06);
-    --shadow-lg: 0 6px 24px rgba(0,73,153,.13), 0 2px 8px rgba(0,73,153,.07);
-    --radius:  8px;
-  }}
-  *, *::before, *::after {{ box-sizing:border-box; margin:0; padding:0; }}
-  body {{
-    font-family: 'Open Sans','Segoe UI',Arial,sans-serif;
-    background: var(--gray-bg);
-    color: #1A3050;
-    font-size: 14px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }}
-
-  /* ══ HEADER — WFP/UN Official White Banner ════════════════════════════════ */
-  header {{
-    background: {WHITE};
-    border-bottom: 3px solid {T_BLUE};
-    box-shadow: 0 2px 12px rgba(0,105,181,.12);
-    position: sticky; top: 0; z-index: 100;
-  }}
-  .hdr-body {{
-    display: flex; align-items: center; gap: 0;
-    padding: 0 40px; flex-wrap: wrap;
-    max-width: 1440px; margin: 0 auto;
-    min-height: 72px;
-  }}
-  .hdr-divider {{
-    width: 1px; height: 44px;
-    background: {GRAY_LINE};
-    flex-shrink: 0; margin: 0 24px;
-  }}
-  .hdr-org {{
-    font-size: 1rem; font-weight: 800; color: {T_BLUE};
-    letter-spacing: .8px; text-transform: uppercase;
-    line-height: 1; margin-bottom: 4px;
-  }}
-  .hdr-title {{
-    font-size: .78rem; font-weight: 700; color: {T_NAVY};
-    letter-spacing: .6px; text-transform: uppercase;
-  }}
-  .hdr-sub {{ font-size: .7rem; color: {GRAY_TEXT}; margin-top: 3px; font-weight: 400; letter-spacing: .2px; }}
-
-  .hdr-meta {{
-    margin-left: auto; display: flex; align-items: stretch; gap: 0;
-  }}
-  .meta-block {{
-    padding: 14px 22px; text-align: center;
-    border-left: 1px solid {GRAY_LINE};
-    display: flex; flex-direction: column; justify-content: center;
-  }}
-  .meta-block:last-child {{ border-right: 1px solid {GRAY_LINE}; }}
-  .meta-lbl {{
-    font-size: .58rem; text-transform: uppercase; letter-spacing: 1.2px;
-    color: {GRAY_TEXT}; font-weight: 700; margin-bottom: 4px;
-  }}
-  .meta-val {{
-    font-size: .88rem; font-weight: 700; color: {T_NAVY};
-  }}
-  .accent {{
-    font-size: 1.05rem !important; font-weight: 800 !important;
-    color: {T_BLUE} !important;
-  }}
-  .meta-sep {{ display: none; }}
-
-  /* ══ PAGE ════════════════════════════════════════════════════════════════ */
-  .page {{ max-width: 1360px; margin: 0 auto; padding: 28px 28px 0; }}
-
-  /* ══ KPI GRID ════════════════════════════════════════════════════════════ */
-  .kpi-grid {{
-    display: grid;
-    grid-template-columns: 1fr 2.2fr 2.2fr;
-    gap: 16px; margin-bottom: 20px;
-  }}
-  @media(max-width:860px){{.kpi-grid{{grid-template-columns:1fr 1fr;}}}}
-  @media(max-width:540px){{.kpi-grid{{grid-template-columns:1fr;}}}}
-
-  .mc {{
-    border-radius: var(--radius);
-    padding: 20px 24px;
-    box-shadow: var(--shadow);
-    border: none;
-    transition: transform .15s, box-shadow .15s;
-  }}
-  .mc:hover {{ transform: translateY(-2px); box-shadow: var(--shadow-lg); }}
-
-  .mc-blue-light {{
-    background: linear-gradient(145deg, {T_BLUE} 0%, {T_NAVY} 100%);
-    border-left: 4px solid rgba(255,255,255,.3);
-  }}
-  .mc-white {{
-    background: {WHITE};
-    border-top: 3px solid {T_BLUE};
-  }}
-  .mc-white:nth-child(3) {{ border-top-color: {T_TEAL}; }}
-
-  .mc-head {{
-    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
-  }}
-  .mc-lbl {{
-    font-size: .65rem; font-weight: 700; letter-spacing: 1.4px;
-    text-transform: uppercase; font-family: 'Open Sans', sans-serif;
-  }}
-  .mc-blue-light .mc-lbl {{ color: rgba(219,235,245,.85); }}
-  .mc-white      .mc-lbl {{ color: var(--gray-txt); }}
-
-  .mc-big {{
-    font-size: 2.8rem; font-weight: 800; color: {WHITE};
-    line-height: 1; letter-spacing: -1.5px;
-    font-family: 'Open Sans', sans-serif;
-  }}
-  .mc-note {{ font-size: .7rem; color: rgba(219,235,245,.65); margin-top: 8px; font-weight: 400; }}
-
-  .stat-row {{
-    display: flex; align-items: stretch; gap: 0;
-    padding: 4px 0;
-  }}
-  .stat-block {{ flex: 1; padding: 0; }}
-  .stat-lbl {{
-    font-size: .62rem; text-transform: uppercase; letter-spacing: .8px;
-    color: var(--gray-txt); font-weight: 700; margin-bottom: 5px;
-  }}
-  .stat-val {{
-    font-size: 1.1rem; font-weight: 800; line-height: 1.2; color: {T_NAVY};
-    font-family: 'Open Sans', sans-serif;
-  }}
-  .stat-sub {{ font-size: .72rem; font-weight: 600; margin-top: 2px; color: var(--gray-txt); }}
-  .stat-sep {{
-    width: 1px; background: var(--gray-ln);
-    margin: 0 18px; flex-shrink: 0; align-self: stretch;
-  }}
-
-  /* ══ SECTION LABEL ═══════════════════════════════════════════════════════ */
-  .section-lbl {{
-    font-size: .68rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 1.3px; color: var(--blue); margin-bottom: 2px;
-  }}
-  .card-sub {{ font-size: .75rem; color: var(--gray-txt); }}
-
-  /* ══ CHART CARD ══════════════════════════════════════════════════════════ */
-  .chart-card {{
-    background: {WHITE};
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    margin-bottom: 20px;
-    overflow: hidden;
-    border: none;
-  }}
-  .h-100 {{ height: calc(100% - 20px) !important; margin-bottom: 0 !important; }}
-  .chart-hdr {{
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 22px 12px;
-    border-bottom: 1px solid var(--gray-ln);
-    background: {WHITE};
-  }}
-  .badge {{
-    font-size: .7rem; font-weight: 700; color: var(--blue);
-    background: var(--light); border: 1px solid #B3D7F0;
-    padding: 3px 11px; border-radius: 20px;
-    white-space: nowrap;
-  }}
-
-  /* ══ FORM CARD ═══════════════════════════════════════════════════════════ */
-  .form-card {{
-    background: {WHITE};
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    margin-bottom: 20px;
-    overflow: hidden;
-  }}
-  .form-hdr {{
-    padding: 14px 22px 12px;
-    border-bottom: 1px solid var(--gray-ln);
-    background: {WHITE};
-  }}
-  .form-grid {{
-    display: grid;
-    grid-template-columns: 155px 1fr 1fr 1fr auto;
-    gap: 14px; padding: 18px 22px; align-items: end;
-  }}
-  @media(max-width:840px){{.form-grid{{grid-template-columns:1fr 1fr;}}}}
-  .fg {{ display: flex; flex-direction: column; }}
-  .fg-btns {{ flex-direction: row; gap: 8px; align-items: flex-end; }}
-  .field-lbl {{
-    font-size: .65rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .7px; color: var(--gray-txt); margin-bottom: 5px;
-  }}
-  .finput {{
-    width: 100%; padding: 9px 12px;
-    border: 1.5px solid var(--gray-ln); border-radius: 7px;
-    font-size: .9rem; font-family: inherit; color: #1A2340;
-    outline: none; transition: border-color .2s, box-shadow .2s;
-    background: {WHITE};
-  }}
-  .finput:focus {{
-    border-color: var(--blue);
-    box-shadow: 0 0 0 3px rgba(0,105,181,.12);
-  }}
-  .btn-primary {{
-    padding: 9px 22px;
-    background: {T_BLUE}; color: {WHITE};
-    border: none; border-radius: 6px;
-    font-size: .85rem; font-weight: 700;
-    cursor: pointer; white-space: nowrap;
-    font-family: 'Open Sans', sans-serif;
-    letter-spacing: .3px;
-    transition: background .15s, transform .1s, box-shadow .15s;
-    box-shadow: 0 2px 8px rgba(0,105,181,.28);
-  }}
-  .btn-primary:hover {{
-    background: {T_NAVY};
-    box-shadow: 0 4px 14px rgba(0,105,181,.38);
-    transform: translateY(-1px);
-  }}
-  .btn-sec {{
-    padding: 9px 14px; background: {WHITE}; color: var(--blue);
-    border: 1.5px solid var(--gray-ln); border-radius: 7px;
-    font-size: .85rem; font-weight: 600; cursor: pointer;
-    font-family: inherit; transition: all .15s;
-  }}
-  .btn-sec:hover {{
-    background: var(--light); border-color: var(--blue);
-  }}
-  .msg-ok   {{ font-size:.8rem; color:var(--green);   padding:7px 0; font-weight:700; }}
-  .msg-warn {{ font-size:.8rem; color:var(--orange);  padding:7px 0; font-weight:700; }}
-  .msg-info {{ font-size:.8rem; color:var(--gray-txt);padding:7px 0; }}
-
-  /* ══ TABLE CARD ══════════════════════════════════════════════════════════ */
-  .table-card {{
-    background: {WHITE};
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    margin-bottom: 20px;
-    overflow: hidden;
-  }}
-  .table-hdr {{
-    padding: 14px 22px 12px;
-    border-bottom: 1px solid var(--gray-ln);
-    background: {WHITE};
-  }}
-  .dist-table {{ width: 100%; border-collapse: collapse; font-size: .85rem; font-family: 'Open Sans', sans-serif; }}
-  .dist-table thead {{
-    background: linear-gradient(90deg, {T_BLUE} 0%, {T_NAVY} 100%);
-  }}
-  .dist-table thead th {{
-    padding: 11px 16px; color: {WHITE}; text-align: left;
-    font-size: .62rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 1px;
-  }}
-  .dist-table tbody tr {{
-    border-bottom: 1px solid {GRAY_LINE};
-    transition: background .1s;
-  }}
-  .dist-table tbody tr:hover {{ background: #EEF5FB; }}
-  .dist-table .tr-alt {{ background: #F7FAFE; }}
-  .dist-table tbody td {{ padding: 10px 16px; vertical-align: middle; }}
-  .td-date {{ color: var(--gray-txt); font-size: .8rem; }}
-  .td-b    {{ font-weight: 700; color: {T_BLUE}; font-size: .9rem; }}
-  .pill {{
-    display: inline-block; padding: 2px 9px; border-radius: 20px;
-    font-size: .7rem; font-weight: 700;
-  }}
-  .pill-blue  {{ background: {T_LIGHT}; color: {T_NAVY}; }}
-  .pill-green {{ background: {T_GREEN_L}; color: {T_GREEN}; }}
-  .btn-del {{
-    background: none; border: none; color: #C0C8D6;
-    cursor: pointer; padding: 3px 7px; border-radius: 4px; font-size: .85rem;
-    transition: color .12s, background .12s;
-  }}
-  .btn-del:hover {{ color: {T_ORANGE}; background: {T_ORANGE_L}; }}
-  .empty-table {{
-    text-align: center; color: var(--gray-txt); padding: 44px;
-    font-size: .9rem;
-  }}
-
-  /* ══ PROJECTION CARD ═════════════════════════════════════════════════════ */
-  .tc-card {{
-    padding: 18px 20px;
-    display: flex; flex-direction: column; gap: 14px;
-  }}
-  .tc-row {{
-    display: flex; align-items: center;
-    background: #F7FAFD; border-radius: 8px; padding: 11px 14px;
-    border: 1px solid var(--gray-ln);
-  }}
-  .tc-stat {{ flex: 1; }}
-  .tc-sep {{
-    width: 1px; background: var(--gray-ln);
-    margin: 0 16px; align-self: stretch;
-  }}
-  .tc-lbl {{
-    font-size: .62rem; text-transform: uppercase; letter-spacing: .8px;
-    color: var(--gray-txt); font-weight: 700; margin-bottom: 3px;
-  }}
-  .tc-val  {{ font-size: 1.05rem; font-weight: 800; display: inline; }}
-  .tc-unit {{ font-size: .7rem; color: var(--gray-txt); font-weight: 600; margin-left: 3px; }}
-
-  .tc-result {{
-    display: flex; align-items: center; gap: 16px; flex: 1;
-    padding: 4px 0;
-  }}
-  .tc-days-block {{
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    min-width: 76px; height: 76px;
-    border-radius: 12px; border: 2px solid; flex-shrink: 0;
-    box-shadow: var(--shadow-sm);
-  }}
-  .tc-days     {{ font-size: 2rem; font-weight: 800; line-height: 1; }}
-  .tc-days-lbl {{ font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }}
-
-  .trend-empty {{
-    padding: 28px 20px; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 8px; flex: 1;
-  }}
-
-  /* ══ DATE PICKER ═════════════════════════════════════════════════════════ */
-  .SingleDatePickerInput {{
-    border: 1.5px solid var(--gray-ln) !important;
-    border-radius: 7px !important;
-    background: {WHITE} !important;
-  }}
-  .DateInput_input {{
-    font-size: .9rem !important; padding: 8px 12px !important;
-    font-family: inherit !important; color: #1A2340 !important;
-  }}
-  .DateInput_input:focus {{ border-bottom: 2px solid var(--blue) !important; }}
-  .CalendarDay__selected {{
-    background: var(--blue) !important; border-color: var(--blue) !important;
-  }}
-  .DayPickerNavigation_button:hover {{ border-color: var(--blue) !important; }}
-
-  /* ══ FOOTER ══════════════════════════════════════════════════════════════ */
-  .page-footer {{
-    border-top: 2px solid {T_BLUE};
-    padding: 16px 4px 28px;
-    display: flex; align-items: center; justify-content: space-between;
-    font-size: .73rem; color: var(--gray-txt);
-    margin-top: 4px;
-    font-family: 'Open Sans', sans-serif;
-  }}
+  body {{ font-family:'Open Sans','Segoe UI',Arial,sans-serif; background:{GRAY_BG}; color:#1A3050; -webkit-font-smoothing:antialiased; }}
+  /* DatePicker */
+  .SingleDatePickerInput {{ border:1.5px solid {GRAY_LINE} !important; border-radius:6px !important; background:white !important; }}
+  .DateInput_input {{ font-size:.9rem !important; padding:8px 12px !important; font-family:'Open Sans',sans-serif !important; color:#1A3050 !important; }}
+  .DateInput_input:focus {{ border-bottom:2px solid {T_BLUE} !important; }}
+  .CalendarDay__selected {{ background:{T_BLUE} !important; border-color:{T_BLUE} !important; }}
+  /* Inputs */
+  .finput {{ width:100%; padding:9px 12px; border:1.5px solid {GRAY_LINE}; border-radius:6px; font-size:.9rem; font-family:'Open Sans',sans-serif; color:#1A3050; outline:none; transition:border-color .2s,box-shadow .2s; background:white; }}
+  .finput:focus {{ border-color:{T_BLUE}; box-shadow:0 0 0 3px rgba(0,105,181,.10); }}
+  /* Buttons */
+  .btn-primary {{ padding:9px 22px; background:{T_BLUE}; color:white; border:none; border-radius:6px; font-size:.85rem; font-weight:700; cursor:pointer; white-space:nowrap; font-family:'Open Sans',sans-serif; letter-spacing:.3px; transition:background .15s,transform .1s,box-shadow .15s; box-shadow:0 2px 8px rgba(0,105,181,.28); }}
+  .btn-primary:hover {{ background:{T_NAVY}; box-shadow:0 4px 14px rgba(0,105,181,.38); transform:translateY(-1px); }}
+  .btn-sec {{ padding:9px 14px; background:white; color:{T_BLUE}; border:1.5px solid {GRAY_LINE}; border-radius:6px; font-size:.85rem; font-weight:600; cursor:pointer; font-family:'Open Sans',sans-serif; transition:all .15s; }}
+  .btn-sec:hover {{ background:{T_LIGHT}; border-color:{T_BLUE}; }}
+  /* Messages */
+  .msg-ok   {{ font-size:.8rem; color:{T_GREEN};   padding:7px 0; font-weight:700; }}
+  .msg-warn {{ font-size:.8rem; color:{T_ORANGE};  padding:7px 0; font-weight:700; }}
+  .msg-info {{ font-size:.8rem; color:{GRAY_TEXT}; padding:7px 0; }}
   </style>
 </head>
 <body>{{%app_entry%}}<footer>{{%config%}}{{%scripts%}}{{%renderer%}}</footer></body>
