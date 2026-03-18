@@ -36,6 +36,7 @@ BASE_M   = 342_432_000
 BASE_B   = 42_804
 
 DATA_FILE = "data.json"
+CT_ROWS   = 6   # nombre de lignes dans la calculatrice tableau
 
 def load():
     return json.load(open(DATA_FILE)) if os.path.exists(DATA_FILE) else []
@@ -253,8 +254,7 @@ def stat_block(label, value, sub="", color=T_NAVY):
     is_highlight = (color == T_BLUE)
     return html.Div([
         html.Div(label,
-                 className="text-[11px] font-semibold uppercase tracking-[1.2px] mb-2",
-                 style={"color": GRAY_TEXT}),
+                 className="text-[11px] font-semibold uppercase tracking-[1.2px] mb-2 text-[#4A6070]"),
         html.Div([
             html.Div(value,
                      className="text-[1.9rem] font-extrabold leading-none tracking-tight",
@@ -263,8 +263,7 @@ def stat_block(label, value, sub="", color=T_NAVY):
                      style={"background": color, "width": "32px"}) if is_highlight else None,
         ]),
         html.Div(sub,
-                 className="text-[12px] font-medium mt-2",
-                 style={"color": GRAY_TEXT}) if sub else None,
+                 className="text-[12px] font-medium mt-2 text-[#4A6070]") if sub else None,
     ], className="flex-1 min-w-0")
 
 def make_trend_card(tr, t):
@@ -283,51 +282,39 @@ def make_trend_card(tr, t):
         html.Div([
             html.Div([
                 html.Div("RYTHME MOYEN",
-                         className="text-[10px] font-semibold uppercase tracking-[1.2px] mb-1.5",
-                         style={"color": GRAY_TEXT}),
+                         className="text-[10px] font-semibold uppercase tracking-[1.2px] mb-1.5 text-[#4A6070]"),
                 html.Div([
                     html.Span(fmt(tr["avg_daily"]),
-                              className="text-[1.9rem] font-extrabold leading-none tracking-tight",
-                              style={"color": T_BLUE}),
+                              className="text-[1.9rem] font-extrabold leading-none tracking-tight text-[#0B72C0]"),
                     html.Span(" / jour",
-                              className="text-[13px] font-medium ml-1.5",
-                              style={"color": GRAY_TEXT}),
+                              className="text-[13px] font-medium ml-1.5 text-[#4A6070]"),
                 ]),
             ], className="flex-1"),
-            html.Div(className="w-px mx-4 self-stretch", style={"background": GRAY_LINE}),
+            html.Div(className="w-px mx-4 self-stretch bg-[#D8E4EF]"),
             html.Div([
                 html.Div("RESTANT",
-                         className="text-[10px] font-semibold uppercase tracking-[1.2px] mb-1.5",
-                         style={"color": GRAY_TEXT}),
+                         className="text-[10px] font-semibold uppercase tracking-[1.2px] mb-1.5 text-[#4A6070]"),
                 html.Div([
                     html.Span(fmt(t["rst_v"]),
-                              className="text-[1.9rem] font-extrabold leading-none tracking-tight",
-                              style={"color": T_ORANGE}),
+                              className="text-[1.9rem] font-extrabold leading-none tracking-tight text-[#E07020]"),
                     html.Span(" ménages",
-                              className="text-[13px] font-medium ml-1.5",
-                              style={"color": GRAY_TEXT}),
+                              className="text-[13px] font-medium ml-1.5 text-[#4A6070]"),
                 ]),
             ], className="flex-1"),
-        ], className="flex items-center rounded-lg px-5 py-4",
-           style={"background": "#F7FAFD", "border": f"1px solid {GRAY_LINE}"}),
+        ], className="flex items-center rounded-lg px-5 py-4 bg-[#F7FAFD] border border-[#D8E4EF]"),
         # Main result
         html.Div([
             html.Div([
                 html.Div(str(tr["days_remaining"]),
-                         className="text-[3.2rem] font-extrabold leading-none tracking-tighter",
-                         style={"color": T_GREEN}),
+                         className="text-[3.2rem] font-extrabold leading-none tracking-tighter text-[#22A060]"),
                 html.Div(f"JOUR{'S' if tr['days_remaining']>1 else ''}",
-                         className="text-[9px] font-bold uppercase tracking-[2px] mt-1",
-                         style={"color": T_GREEN}),
-            ], className="flex flex-col items-center justify-center min-w-[90px] h-[90px] rounded-xl flex-shrink-0",
-               style={"border": f"2px solid {T_GREEN}", "background": T_GREEN_L}),
+                         className="text-[9px] font-bold uppercase tracking-[2px] mt-1 text-[#22A060]"),
+            ], className="flex flex-col items-center justify-center min-w-[90px] h-[90px] rounded-xl flex-shrink-0 border-2 border-[#22A060] bg-[#E8F7EF]"),
             html.Div([
                 html.Div("OBJECTIF ESTIMÉ ATTEINT DANS",
-                         className="text-[10px] font-semibold uppercase tracking-[1px] mb-2",
-                         style={"color": GRAY_TEXT}),
+                         className="text-[10px] font-semibold uppercase tracking-[1px] mb-2 text-[#4A6070]"),
                 html.Div(tr["est_date"].strftime("%d %b %Y").upper(),
-                         className="text-[1.4rem] font-extrabold tracking-wide",
-                         style={"color": T_GREEN}),
+                         className="text-[1.4rem] font-extrabold tracking-wide text-[#22A060]"),
             ], className="ml-5"),
         ], className="flex items-center"),
     ], className="flex flex-col gap-4 p-5")
@@ -393,15 +380,13 @@ app.layout = lambda: html.Div([
                 html.Div([
                     html.Span("👥", className="text-3xl"),
                     html.Span("BÉNÉFICIAIRES SERVIS",
-                              className="text-[12px] font-bold tracking-[1.5px] uppercase ml-3",
-                              style={"color":"rgba(219,235,245,0.85)"}),
+                              className="text-[12px] font-bold tracking-[1.5px] uppercase ml-3 text-[rgba(219,235,245,0.85)]"),
                 ], className="flex items-center mb-4"),
                 html.Div(id="kpi-benef",
                          className="text-[4.2rem] font-extrabold text-white leading-none tracking-[-3px]"),
                 html.Div(className="h-[3px] w-14 rounded-full bg-white opacity-40 my-3"),
                 html.Div("Total cumulé depuis le début",
-                         className="text-[12.5px]",
-                         style={"color":"rgba(255,255,255,0.65)"}),
+                         className="text-[12.5px] text-[rgba(255,255,255,0.65)]"),
             ], className="rounded-xl p-5 border-l-4 border-[rgba(255,255,255,0.25)]",
                style={"background": f"linear-gradient(145deg, {T_BLUE} 0%, {T_NAVY} 100%)",
                       "boxShadow": "0 4px 16px rgba(0,105,181,0.25)"}),
@@ -493,54 +478,131 @@ app.layout = lambda: html.Div([
         ], className="bg-white rounded-xl mb-5 overflow-hidden",
            style={"boxShadow": "0 2px 12px rgba(0,105,181,0.10)"}),
 
-        # Formulaire
-        html.Div([
-            html.Div([
-                html.Div("SAISIE JOURNALIÈRE",
-                         className="text-[13px] font-bold uppercase tracking-[1.3px] text-[#0069B5]"),
-                html.Div("Renseignez les données de distribution du jour",
-                         className="text-[13px] text-[#3A5070] mt-0.5"),
-            ], className="px-5 py-3.5 border-b border-[#D5E3EF]"),
-            html.Div([
+        # Formulaire + Calculatrice côte à côte
+        dbc.Row([
+            # ── Saisie journalière ────────────────────────────────────────
+            dbc.Col([
                 html.Div([
-                    html.Label("Date",
-                               className="block text-[11px] font-bold uppercase tracking-[0.7px] text-[#3A5070] mb-2"),
-                    dcc.DatePickerSingle(id="f-date", date=date.today().isoformat(),
-                                        display_format="DD/MM/YYYY", style={"width":"100%"}),
-                ], className="flex flex-col"),
+                    html.Div([
+                        html.Div("SAISIE JOURNALIÈRE",
+                                 className="text-[13px] font-bold uppercase tracking-[1.3px] text-[#0069B5]"),
+                        html.Div("Renseignez les données de distribution du jour",
+                                 className="text-[12px] text-[#3A5070] mt-0.5"),
+                    ], className="px-5 py-3.5 border-b border-[#D5E3EF]"),
+                    html.Div([
+                        html.Div([
+                            html.Label("Date",
+                                       className="block text-[11px] font-bold uppercase tracking-[0.7px] text-[#3A5070] mb-2"),
+                            dcc.DatePickerSingle(id="f-date", date=date.today().isoformat(),
+                                                 display_format="DD/MM/YYYY", style={"width":"100%"}),
+                        ], className="flex flex-col"),
+                        html.Div([
+                            html.Label("Bénéficiaires servis",
+                                       className="block text-[11px] font-bold uppercase tracking-[0.7px] text-[#3A5070] mb-2"),
+                            dcc.Input(id="f-ben", type="number", min=0, placeholder="ex : 4 250",
+                                      className="w-full px-3 py-2 border border-[#D8E4EF] rounded-md text-sm text-[#1A3050] bg-white outline-none focus:border-[#0B72C0] transition-all"),
+                        ], className="flex flex-col"),
+                        html.Div([
+                            html.Label("Ménages (Vouchers)",
+                                       className="block text-[11px] font-bold uppercase tracking-[0.7px] text-[#3A5070] mb-2"),
+                            dcc.Input(id="f-vch", type="number", min=0, placeholder="ex : 850",
+                                      className="w-full px-3 py-2 border border-[#D8E4EF] rounded-md text-sm text-[#1A3050] bg-white outline-none focus:border-[#0B72C0] transition-all"),
+                        ], className="flex flex-col"),
+                        html.Div([
+                            html.Label("Montant XAF",
+                                       className="block text-[11px] font-bold uppercase tracking-[0.7px] text-[#3A5070] mb-2"),
+                            dcc.Input(id="f-amt", type="number", min=0, placeholder="ex : 20 450 000",
+                                      className="w-full px-3 py-2 border border-[#D8E4EF] rounded-md text-sm text-[#1A3050] bg-white outline-none focus:border-[#0B72C0] transition-all"),
+                        ], className="flex flex-col"),
+                        html.Div([
+                            html.Button("＋ Ajouter", id="btn-add",
+                                        className="px-5 py-2 bg-[#0B72C0] text-white border-0 rounded-md text-sm font-bold cursor-pointer tracking-wide transition-all hover:bg-[#17375E] hover:-translate-y-px"),
+                            html.Button("⬇ CSV", id="btn-csv",
+                                        className="px-3.5 py-2 bg-white text-[#0B72C0] border border-[#D8E4EF] rounded-md text-sm font-semibold cursor-pointer transition-all hover:bg-[#EBF4FC] hover:border-[#0B72C0]"),
+                            dcc.Download(id="download"),
+                        ], className="flex gap-2 items-end"),
+                    ], className="grid gap-4 p-5 items-end",
+                       style={"gridTemplateColumns": "140px 1fr 1fr 1fr auto"}),
+                    html.Div(id="form-msg", className="px-5 pb-3"),
+                ], className="bg-white rounded-xl overflow-hidden h-full",
+                   style={"boxShadow": "0 2px 12px rgba(0,105,181,0.10)"}),
+            ], md=8),
+
+            # ── Calculatrice ──────────────────────────────────────────────
+            dbc.Col([
                 html.Div([
-                    html.Label("Bénéficiaires servis",
-                               className="block text-[11px] font-bold uppercase tracking-[0.7px] text-[#3A5070] mb-2"),
-                    dcc.Input(id="f-ben", type="number", min=0,
-                              placeholder="ex : 4 250", className="finput"),
-                ], className="flex flex-col"),
-                html.Div([
-                    html.Label("Ménages (Vouchers)",
-                               className="block text-[11px] font-bold uppercase tracking-[0.7px] text-[#3A5070] mb-2"),
-                    dcc.Input(id="f-vch", type="number", min=0,
-                              placeholder="ex : 850", className="finput"),
-                ], className="flex flex-col"),
-                html.Div([
-                    html.Label("Montant XAF",
-                               className="block text-[11px] font-bold uppercase tracking-[0.7px] text-[#3A5070] mb-2"),
-                    dcc.Input(id="f-amt", type="number", min=0,
-                              placeholder="ex : 20 450 000", className="finput"),
-                ], className="flex flex-col"),
-                html.Div([
-                    html.Button("＋ Ajouter", id="btn-add", className="btn-primary"),
-                    html.Button("⬇ CSV",     id="btn-csv", className="btn-sec"),
-                    dcc.Download(id="download"),
-                ], className="flex gap-2 items-end"),
-            ], className="grid gap-4 p-5 items-end",
-               style={"gridTemplateColumns": "155px 1fr 1fr 1fr auto"}),
-            html.Div(id="form-msg", className="px-5 pb-3"),
-        ], className="bg-white rounded-xl mb-5 overflow-hidden",
-           style={"boxShadow": "0 2px 12px rgba(0,105,181,0.10)"}),
+                    # Header calculatrice
+                    html.Div([
+                        html.Div([
+                            html.Span("🧮", className="mr-2 text-base"),
+                            html.Span("CALCULATRICE",
+                                      className="text-[13px] font-bold uppercase tracking-[1.3px] text-[#0069B5]"),
+                        ], className="flex items-center"),
+                        html.Div([
+                            html.Button([html.Span("💰", className="mr-1"), "Moy."],
+                                        id="sc-avg", n_clicks=0,
+                                        className="px-2 py-1 bg-white text-[#17375E] border border-[#D8E4EF] rounded text-[10px] font-semibold cursor-pointer hover:bg-[#EBF4FC] hover:text-[#0B72C0] transition-all"),
+                            html.Button([html.Span("📉", className="mr-1"), "Budget"],
+                                        id="sc-budget", n_clicks=0,
+                                        className="px-2 py-1 bg-white text-[#17375E] border border-[#D8E4EF] rounded text-[10px] font-semibold cursor-pointer hover:bg-[#EBF4FC] hover:text-[#0B72C0] transition-all"),
+                            html.Button([html.Span("📊", className="mr-1"), "%"],
+                                        id="sc-pct", n_clicks=0,
+                                        className="px-2 py-1 bg-white text-[#17375E] border border-[#D8E4EF] rounded text-[10px] font-semibold cursor-pointer hover:bg-[#EBF4FC] hover:text-[#0B72C0] transition-all"),
+                        ], className="ml-auto flex gap-1"),
+                    ], className="px-4 py-3 border-b border-[#D5E3EF] flex items-center"),
+
+                    html.Div([
+                        dcc.Store(id="wb-state", data={"disp":"0","prev":None,"op":None,"new":True,"expr":""}),
+                        dcc.Store(id="wb-hist", data=[]),
+                        # Écran
+                        html.Div([
+                            html.Div(id="wb-expr",
+                                     className="text-right text-[10px] text-[#6B8BAA] min-h-[13px] truncate"),
+                            html.Div(id="wb-disp", children="0",
+                                     className="text-right text-[1.8rem] font-light text-[#17375E] leading-tight truncate"),
+                        ], className="bg-[#EBF4FC] rounded-lg px-3 pt-2 pb-1 mb-2 border border-[#D5E3EF]"),
+                        # Boutons
+                        html.Div([
+                            html.Button("%",   id="wb-pct",  n_clicks=0, className="wb-fn"),
+                            html.Button("√x",  id="wb-sqrt", n_clicks=0, className="wb-fn"),
+                            html.Button("x²",  id="wb-sq",   n_clicks=0, className="wb-fn"),
+                            html.Button("1/x", id="wb-inv",  n_clicks=0, className="wb-fn"),
+                            html.Button("CE",  id="wb-ce",   n_clicks=0, className="wb-util"),
+                            html.Button("C",   id="wb-c",    n_clicks=0, className="wb-util"),
+                            html.Button("⌫",   id="wb-back", n_clicks=0, className="wb-util"),
+                            html.Button("÷",   id="wb-div",  n_clicks=0, className="wb-op"),
+                            html.Button("7",   id="wb-7",    n_clicks=0, className="wb-num"),
+                            html.Button("8",   id="wb-8",    n_clicks=0, className="wb-num"),
+                            html.Button("9",   id="wb-9",    n_clicks=0, className="wb-num"),
+                            html.Button("×",   id="wb-mul",  n_clicks=0, className="wb-op"),
+                            html.Button("4",   id="wb-4",    n_clicks=0, className="wb-num"),
+                            html.Button("5",   id="wb-5",    n_clicks=0, className="wb-num"),
+                            html.Button("6",   id="wb-6",    n_clicks=0, className="wb-num"),
+                            html.Button("−",   id="wb-sub",  n_clicks=0, className="wb-op"),
+                            html.Button("1",   id="wb-1",    n_clicks=0, className="wb-num"),
+                            html.Button("2",   id="wb-2",    n_clicks=0, className="wb-num"),
+                            html.Button("3",   id="wb-3",    n_clicks=0, className="wb-num"),
+                            html.Button("+",   id="wb-add",  n_clicks=0, className="wb-op"),
+                            html.Button("+/−", id="wb-sign", n_clicks=0, className="wb-num"),
+                            html.Button("0",   id="wb-0",    n_clicks=0, className="wb-num"),
+                            html.Button(",",   id="wb-dot",  n_clicks=0, className="wb-num"),
+                            html.Button("=",   id="wb-eq",   n_clicks=0, className="wb-eq"),
+                        ], className="grid grid-cols-4 gap-1"),
+                        # Historique compact
+                        html.Div(id="wb-history",
+                                 className="mt-3 flex flex-col gap-1 max-h-[120px] overflow-y-auto",
+                                 children=[html.Div("— aucun calcul —",
+                                                     className="text-[10px] text-[#4A6070] italic text-center py-2")]),
+                    ], className="p-3"),
+                ], className="bg-white rounded-xl overflow-hidden h-full",
+                   style={"boxShadow": "0 2px 12px rgba(0,105,181,0.10)"}),
+            ], md=4),
+        ], className="g-4 mb-5"),
 
         # Footer
         html.Footer([
             html.Div([
-                html.Strong("UN WFP CHAD", style={"color": T_BLUE}),
+                html.Strong("UN WFP CHAD", className="text-[#0B72C0]"),
                 html.Span(" — Tableau de bord distribution encours",
                           className="text-[#3A5070]"),
             ]),
@@ -575,14 +637,14 @@ def add_entry(_, fd, fb, fv, fm, data):
     if errs:
         return (no_update,
                 html.Div("⚠ " + " · ".join(errs).capitalize()+".",
-                         className="msg-warn"),
+                         className="text-xs text-[#E07020] py-1.5 font-bold"),
                 no_update, no_update, no_update)
     entries = list(data or [])
     entries.append({"id":str(datetime.now().timestamp()),
                     "date":fd,"b":int(fb),"v":int(fv),"m":float(fm)})
     save(entries)
     return (entries,
-            html.Div("✓ Entrée ajoutée avec succès.", className="msg-ok"),
+            html.Div("✓ Entrée ajoutée avec succès.", className="text-xs text-[#22A060] py-1.5 font-bold"),
             None, None, None)
 
 
@@ -610,7 +672,7 @@ def del_entry(sub, eid, data):
     if not sub or not eid: return no_update, no_update
     entries = [e for e in (data or []) if e["id"] != eid]
     save(entries)
-    return entries, html.Div("🗑 Entrée supprimée.", className="msg-info")
+    return entries, html.Div("🗑 Entrée supprimée.", className="text-xs text-[#4A6070] py-1.5")
 
 
 @app.callback(
@@ -704,9 +766,8 @@ def update(data):
                 html.Td(f"{d[8:]}/{d[5:7]}/{d[:4]}",
                         className="px-4 py-3.5 text-[#3A5070] text-[13px] whitespace-nowrap font-semibold"),
                 html.Td(fmt(e.get("b",0)),
-                        className="px-4 py-3.5 font-extrabold text-[15px]",
-                        style={"color": T_BLUE}),
-                html.Td(html.Strong(fmt(e["v"]), style={"fontSize":"15px","color":T_NAVY}),
+                        className="px-4 py-3.5 font-extrabold text-[15px] text-[#0B72C0]"),
+                html.Td(html.Strong(fmt(e["v"]), className="text-[15px] text-[#17375E]"),
                         className="px-4 py-3.5"),
                 html.Td(html.Span(f"{pv:.2f}%",
                         className="inline-block px-3 py-1 rounded-full text-[12px] font-semibold bg-[#EBF4FC] text-[#0B72C0]"),
@@ -716,7 +777,7 @@ def update(data):
                 html.Td(html.Span(f"{pm:.2f}%",
                         className="inline-block px-3 py-1 rounded-full text-[12px] font-semibold bg-[#E8F7EF] text-[#22A060]"),
                         className="px-4 py-3.5"),
-                html.Td(html.Strong(fmt(cm[e["id"]]), style={"color":"#17375E","fontSize":"15px"}),
+                html.Td(html.Strong(fmt(cm[e["id"]]), className="text-[#17375E] text-[15px]"),
                         className="px-4 py-3.5"),
                 html.Td(html.Button("✕",
                         id={"type":"btn-del","index":e["id"]},
@@ -741,6 +802,185 @@ def update(data):
             f"Au {now.strftime('%d/%m/%Y')}")
 
 
+# ── CALCULATRICE ─────────────────────────────────────────────────────────────
+
+# ── CALCULATRICE WINDOWS ─────────────────────────────────────────────────────
+
+_WB_BTN_IDS = [
+    "wb-pct","wb-sqrt","wb-sq","wb-inv",
+    "wb-ce","wb-c","wb-back","wb-div",
+    "wb-7","wb-8","wb-9","wb-mul",
+    "wb-4","wb-5","wb-6","wb-sub",
+    "wb-1","wb-2","wb-3","wb-add",
+    "wb-sign","wb-0","wb-dot","wb-eq",
+]
+
+def _wb_fmt(v):
+    """Formate un float pour l'affichage calculatrice."""
+    if v != v: return "Erreur"           # NaN
+    if v == int(v) and abs(v) < 1e15:
+        return f"{int(v):,}".replace(",", "\u202f")
+    s = f"{v:.10g}"
+    if "." in s:
+        i, d = s.split(".")
+        try: i_fmt = f"{int(i):,}".replace(",", "\u202f")
+        except: i_fmt = i
+        return f"{i_fmt},{d}"
+    return s
+
+def _wb_apply(a, op, b):
+    if op == "+": return a + b
+    if op == "-": return a - b
+    if op == "*": return a * b
+    if op == "/":
+        if b == 0: return float("nan")
+        return a / b
+    return b
+
+
+@app.callback(
+    Output("wb-state",   "data"),
+    Output("wb-disp",    "children"),
+    Output("wb-expr",    "children"),
+    Output("wb-hist",    "data"),
+    Output("wb-history", "children"),
+    *[Input(bid, "n_clicks") for bid in _WB_BTN_IDS],
+    State("wb-state", "data"),
+    State("wb-hist",  "data"),
+    prevent_initial_call=True,
+)
+def wb_engine(*args):
+    state = dict(args[-2] or {"disp":"0","prev":None,"op":None,"new":True,"expr":""})
+    hist  = list(args[-1] or [])
+    tid   = ctx.triggered_id
+
+    disp = state["disp"]
+    prev = state["prev"]
+    op   = state["op"]
+    new  = state["new"]
+    expr = state["expr"]
+
+    def num(): return float(disp.replace("\u202f","").replace(",",".")) if disp not in ("Erreur","") else 0
+
+    # ── Chiffres ──────────────────────────────────────────────────────────────
+    digit_map = {"wb-0":"0","wb-1":"1","wb-2":"2","wb-3":"3","wb-4":"4",
+                 "wb-5":"5","wb-6":"6","wb-7":"7","wb-8":"8","wb-9":"9"}
+    if tid in digit_map:
+        d = digit_map[tid]
+        if new or disp in ("0","Erreur"):
+            disp = d; new = False
+        else:
+            disp = (disp + d) if len(disp) < 15 else disp
+
+    # ── Virgule ───────────────────────────────────────────────────────────────
+    elif tid == "wb-dot":
+        if new: disp = "0,"; new = False
+        elif "," not in disp: disp += ","
+
+    # ── Effacement ────────────────────────────────────────────────────────────
+    elif tid == "wb-c":
+        disp = "0"; prev = None; op = None; new = True; expr = ""
+    elif tid == "wb-ce":
+        disp = "0"; new = True
+    elif tid == "wb-back":
+        if not new and disp not in ("Erreur",):
+            disp = disp[:-1] or "0"
+
+    # ── Signe ─────────────────────────────────────────────────────────────────
+    elif tid == "wb-sign":
+        v = num()
+        disp = _wb_fmt(-v)
+
+    # ── Opérateurs binaires ───────────────────────────────────────────────────
+    elif tid in ("wb-add","wb-sub","wb-mul","wb-div"):
+        op_map = {"wb-add":"+","wb-sub":"-","wb-mul":"*","wb-div":"/"}
+        sym_map = {"wb-add":"+","wb-sub":"−","wb-mul":"×","wb-div":"÷"}
+        if not new and prev is not None and op:
+            result = _wb_apply(prev, op, num())
+            prev = result; disp = _wb_fmt(result)
+        else:
+            prev = num()
+        op = op_map[tid]
+        expr = f"{_wb_fmt(prev)} {sym_map[tid]}"
+        new = True
+
+    # ── Égal ─────────────────────────────────────────────────────────────────
+    elif tid == "wb-eq":
+        if prev is not None and op:
+            b = num()
+            result = _wb_apply(prev, op, b)
+            sym_map = {"+":"+","-":"−","*":"×","/":"÷"}
+            entry = f"{_wb_fmt(prev)} {sym_map.get(op,'?')} {_wb_fmt(b)} = {_wb_fmt(result)}"
+            hist = [entry] + hist[:19]
+            disp = _wb_fmt(result)
+            expr = entry
+            prev = None; op = None; new = True
+
+    # ── Fonctions unaires ─────────────────────────────────────────────────────
+    elif tid == "wb-pct":
+        v = (prev or 0) * num() / 100
+        disp = _wb_fmt(v); new = True
+    elif tid == "wb-sqrt":
+        v = num()
+        disp = _wb_fmt(math.sqrt(v)) if v >= 0 else "Erreur"; new = True
+        expr = f"√({_wb_fmt(v)})"
+    elif tid == "wb-sq":
+        v = num(); disp = _wb_fmt(v*v); new = True
+        expr = f"({_wb_fmt(v)})²"
+    elif tid == "wb-inv":
+        v = num()
+        disp = _wb_fmt(1/v) if v != 0 else "Erreur"; new = True
+        expr = f"1/({_wb_fmt(v)})"
+
+    new_state = {"disp": disp, "prev": prev, "op": op, "new": new, "expr": expr}
+
+    # Historique UI compact
+    if hist:
+        hist_ui = [
+            html.Div(h, className=f"text-right text-[10px] py-1 px-2 rounded {'bg-[#EBF4FC] text-[#0B72C0] font-semibold' if i==0 else 'text-[#4A6070]'}")
+            for i, h in enumerate(hist)
+        ]
+    else:
+        hist_ui = [html.Div("— aucun calcul —", className="text-[10px] text-[#4A6070] italic text-center py-2")]
+
+    return new_state, disp, expr, hist, hist_ui
+
+
+# ── Raccourcis WFP → calculatrice Windows ─────────────────────────────────────
+@app.callback(
+    Output("wb-state",   "data",    allow_duplicate=True),
+    Output("wb-disp",    "children",allow_duplicate=True),
+    Output("wb-expr",    "children",allow_duplicate=True),
+    Input("sc-avg",    "n_clicks"),
+    Input("sc-budget", "n_clicks"),
+    Input("sc-pct",    "n_clicks"),
+    State("store", "data"),
+    prevent_initial_call=True,
+)
+def wb_shortcut(sc_avg, sc_budget, sc_pct, data):
+    t = compute(data or [])
+    tid = ctx.triggered_id
+    if tid == "sc-avg":
+        if t["tot_v"] == 0:
+            return no_update, no_update, "⚠ Aucune donnée"
+        a, b = t["tot_m"], t["tot_v"]
+        res = a / b
+        expr = f"{_wb_fmt(a)} ÷ {_wb_fmt(b)} = {_wb_fmt(res)}"
+        return {"disp":_wb_fmt(res),"prev":None,"op":None,"new":True,"expr":expr}, _wb_fmt(res), expr
+    if tid == "sc-budget":
+        avg_m = t["tot_m"] / t["tot_v"] if t["tot_v"] else 0
+        a, b = t["rst_v"], avg_m
+        res = a * b
+        expr = f"{_wb_fmt(a)} × {_wb_fmt(b)} = {_wb_fmt(res)}"
+        return {"disp":_wb_fmt(res),"prev":None,"op":None,"new":True,"expr":expr}, _wb_fmt(res), expr
+    if tid == "sc-pct":
+        a, b = t["tot_v"], TARGET_V
+        res = a / b
+        expr = f"{_wb_fmt(a)} ÷ {_wb_fmt(b)} = {_wb_fmt(res)}  (× 100 = {_wb_fmt(res*100)} %)"
+        return {"disp":_wb_fmt(res),"prev":None,"op":None,"new":True,"expr":expr}, _wb_fmt(res), expr
+    return no_update, no_update, no_update
+
+
 # ── CSS ──────────────────────────────────────────────────────────────────────
 app.index_string = f"""<!DOCTYPE html>
 <html>
@@ -759,24 +999,23 @@ app.index_string = f"""<!DOCTYPE html>
     }}
   </script>
   <style>
-  body {{ font-family:'Open Sans','Segoe UI',Arial,sans-serif; background:{GRAY_BG}; color:#1A3050; -webkit-font-smoothing:antialiased; }}
-  /* DatePicker */
+  body {{ font-family:'Inter','system-ui',sans-serif; background:{GRAY_BG}; color:#1A3050; -webkit-font-smoothing:antialiased; }}
+  /* DatePicker vendor overrides */
   .SingleDatePickerInput {{ border:1.5px solid {GRAY_LINE} !important; border-radius:6px !important; background:white !important; }}
-  .DateInput_input {{ font-size:.9rem !important; padding:8px 12px !important; font-family:'Open Sans',sans-serif !important; color:#1A3050 !important; }}
+  .DateInput_input {{ font-size:.9rem !important; padding:8px 12px !important; font-family:'Inter',sans-serif !important; color:#1A3050 !important; }}
   .DateInput_input:focus {{ border-bottom:2px solid {T_BLUE} !important; }}
   .CalendarDay__selected {{ background:{T_BLUE} !important; border-color:{T_BLUE} !important; }}
-  /* Inputs */
-  .finput {{ width:100%; padding:9px 12px; border:1.5px solid {GRAY_LINE}; border-radius:6px; font-size:.9rem; font-family:'Open Sans',sans-serif; color:#1A3050; outline:none; transition:border-color .2s,box-shadow .2s; background:white; }}
-  .finput:focus {{ border-color:{T_BLUE}; box-shadow:0 0 0 3px rgba(0,105,181,.10); }}
-  /* Buttons */
-  .btn-primary {{ padding:9px 22px; background:{T_BLUE}; color:white; border:none; border-radius:6px; font-size:.85rem; font-weight:700; cursor:pointer; white-space:nowrap; font-family:'Open Sans',sans-serif; letter-spacing:.3px; transition:background .15s,transform .1s,box-shadow .15s; box-shadow:0 2px 8px rgba(0,105,181,.28); }}
-  .btn-primary:hover {{ background:{T_NAVY}; box-shadow:0 4px 14px rgba(0,105,181,.38); transform:translateY(-1px); }}
-  .btn-sec {{ padding:9px 14px; background:white; color:{T_BLUE}; border:1.5px solid {GRAY_LINE}; border-radius:6px; font-size:.85rem; font-weight:600; cursor:pointer; font-family:'Open Sans',sans-serif; transition:all .15s; }}
-  .btn-sec:hover {{ background:{T_LIGHT}; border-color:{T_BLUE}; }}
-  /* Messages */
-  .msg-ok   {{ font-size:.8rem; color:{T_GREEN};   padding:7px 0; font-weight:700; }}
-  .msg-warn {{ font-size:.8rem; color:{T_ORANGE};  padding:7px 0; font-weight:700; }}
-  .msg-info {{ font-size:.8rem; color:{GRAY_TEXT}; padding:7px 0; }}
+  /* Calculatrice Windows */
+  .wb-num  {{ width:100%; padding:9px 0; background:#FFFFFF; color:{T_NAVY}; border:1px solid {GRAY_LINE}; border-radius:6px; font-size:.88rem; font-weight:600; cursor:pointer; transition:all .12s; font-family:'Inter',sans-serif; }}
+  .wb-num:hover  {{ background:{T_LIGHT}; border-color:{T_BLUE}; color:{T_BLUE}; }}
+  .wb-op   {{ width:100%; padding:9px 0; background:{T_LIGHT}; color:{T_BLUE}; border:1px solid #C0D8EE; border-radius:6px; font-size:.92rem; font-weight:700; cursor:pointer; transition:all .12s; font-family:'Inter',sans-serif; }}
+  .wb-op:hover   {{ background:{T_BLUE}; color:white; border-color:{T_BLUE}; }}
+  .wb-fn   {{ width:100%; padding:9px 0; background:#F0F4F8; color:{GRAY_TEXT}; border:1px solid {GRAY_LINE}; border-radius:6px; font-size:.75rem; font-weight:600; cursor:pointer; transition:all .12s; font-family:'Inter',sans-serif; }}
+  .wb-fn:hover   {{ background:#D8E8F5; color:{T_NAVY}; }}
+  .wb-util {{ width:100%; padding:9px 0; background:#EBF4FC; color:{T_NAVY}; border:1px solid {GRAY_LINE}; border-radius:6px; font-size:.82rem; font-weight:700; cursor:pointer; transition:all .12s; font-family:'Inter',sans-serif; }}
+  .wb-util:hover {{ background:#C8DFF5; }}
+  .wb-eq   {{ width:100%; padding:9px 0; background:{T_BLUE}; color:white; border:none; border-radius:6px; font-size:.95rem; font-weight:800; cursor:pointer; transition:all .12s; font-family:'Inter',sans-serif; box-shadow:0 2px 8px rgba(11,114,192,.35); }}
+  .wb-eq:hover   {{ background:{T_NAVY}; box-shadow:0 3px 12px rgba(11,114,192,.5); transform:translateY(-1px); }}
   </style>
 </head>
 <body>{{%app_entry%}}<footer>{{%config%}}{{%scripts%}}{{%renderer%}}</footer></body>
